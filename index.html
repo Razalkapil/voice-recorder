@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Voice Recorder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <button class="theme-toggle" id="themeToggle" type="button">
+      <svg
+        class="theme-icon"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path
+          d="M12,22 C17.5228475,22 22,17.5228475 22,12 C22,6.4771525 17.5228475,2 12,2 C6.4771525,2 2,6.4771525 2,12 C2,17.5228475 6.4771525,22 12,22 Z M12,20.5 L12,3.5 C16.6944204,3.5 20.5,7.30557963 20.5,12 C20.5,16.6944204 16.6944204,20.5 12,20.5 Z"
+        ></path>
+      </svg>
+    </button>
+    <main class="app">
+      <section class="recordings">
+        <header class="recordings-header">
+          <h2>Recordings</h2>
+          <button class="clear-button" id="clearAll" type="button">
+            Clear all
+          </button>
+        </header>
+        <ul class="recordings-list" id="recordingsList"></ul>
+      </section>
+
+   
+
+        <div class="floating-recorder">
+          <button
+            class="record-button floating"
+            id="recordButton"
+            type="button"
+          >
+            <span class="record-dot"></span>
+            <span id="recordLabel">Record</span>
+          </button>
+
+          <div class="waveform waveform-mini">
+            <canvas id="waveformCanvas" width="640" height="160"></canvas>
+            <div class="timer" id="timer">00:00</div>
+          </div>
+        </div>
+
+
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>

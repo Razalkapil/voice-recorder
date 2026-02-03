@@ -1,0 +1,496 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:root {
+  color-scheme: dark;
+  --bg: #0b0f17;
+  --bg-accent: #121827;
+  --surface: rgba(15, 23, 42, 0.9);
+  --surface-strong: #0f172a;
+  --surface-muted: rgba(15, 23, 42, 0.6);
+  --border: rgba(148, 163, 184, 0.18);
+  --text: #e2e8f0;
+  --muted: #94a3b8;
+  --accent: #38bdf8;
+  --accent-strong: #22d3ee;
+  --shadow: rgba(8, 12, 20, 0.6);
+  --glow: rgba(56, 189, 248, 0.2);
+}
+
+html[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f4f7fb;
+  --bg-accent: #e5edf7;
+  --surface: #ffffff;
+  --surface-strong: #f8fafc;
+  --surface-muted: #ffffff;
+  --border: rgba(15, 23, 42, 0.12);
+  --text: #0f172a;
+  --muted: #475569;
+  --accent: #2563eb;
+  --accent-strong: #3b82f6;
+  --shadow: rgba(15, 23, 42, 0.08);
+  --glow: rgba(37, 99, 235, 0.15);
+}
+
+body {
+  margin: 0;
+  font-family: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+  background: radial-gradient(circle at bottom, var(--bg-accent) 0%, var(--bg) 60%);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 32px 16px;
+  animation: pageFade 0.8s ease-out both;
+  -webkit-font-smoothing: antialiased;
+}
+
+.theme-toggle {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 12;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 10px 20px var(--shadow);
+  cursor: pointer;
+  font-size: 13px;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.theme-toggle:hover {
+  box-shadow: 0 0 14px var(--glow);
+  border-color: rgba(56, 189, 248, 0.5);
+}
+
+.theme-icon {
+  width: 28px;
+  height: 28px;
+  fill: currentColor;
+  transition: transform 0.3s ease;
+}
+
+html[data-theme="light"] .theme-icon {
+  transform: scaleX(-1);
+}
+
+.app {
+  width: min(900px, 100%);
+  display: grid;
+  gap: 32px;
+  padding-bottom: 96px;
+}
+
+.card {
+  background: var(--surface);
+  border-radius: 18px;
+  padding: 24px;
+  border: 1px solid var(--border);
+  box-shadow: 0 18px 40px var(--shadow), 0 0 24px var(--glow);
+  display: grid;
+  gap: 20px;
+  animation: floatIn 0.7s ease-out both;
+}
+
+.header h1 {
+  margin: 0 0 8px;
+  font-size: 28px;
+}
+
+.header p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.waveform {
+  background: var(--surface-strong);
+  border-radius: 14px;
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  box-shadow: inset 0 0 18px rgba(15, 23, 42, 0.4);
+}
+
+canvas {
+  width: 100%;
+  height: 160px;
+  display: block;
+}
+
+.timer {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+}
+
+.record-button {
+  font-family: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+  border-radius: 999px;
+  padding: 14px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--surface-strong), var(--surface-muted));
+  color: var(--text);
+  border: 1px solid var(--border);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.floating-recorder {
+  position: fixed;
+  right: 32px;
+  bottom: 32px;
+  z-index: 10;
+  display: grid;
+  gap: 10px;
+  justify-items: end;
+}
+
+.record-button.floating {
+  padding: 16px 20px;
+  box-shadow: 0 16px 30px rgba(8, 12, 20, 0.45);
+}
+
+.floating-recorder .waveform {
+  width: 240px;
+  max-height: 0;
+  padding: 0;
+  margin: 0;
+  opacity: 0;
+  transform: scaleY(0.9);
+  transform-origin: bottom;
+  border-color: transparent;
+  box-shadow: none;
+  transition: max-height 0.3s ease, opacity 0.2s ease, transform 0.3s ease,
+    padding 0.3s ease;
+  pointer-events: none;
+}
+
+.floating-recorder .waveform canvas {
+  height: 64px;
+}
+
+.floating-recorder .waveform .timer {
+  top: 10px;
+  right: 10px;
+  font-size: 11px;
+  padding: 4px 8px;
+  color: #f4f7fb;
+}
+
+.record-button.recording + .waveform,
+.record-button.recording ~ .waveform {
+  max-height: 120px;
+  padding: 10px;
+  opacity: 1;
+  transform: scaleY(1);
+  border-color: var(--border);
+}
+
+.record-button:hover {
+  box-shadow: 0 0 18px var(--glow);
+  border-color: rgba(56, 189, 248, 0.5);
+}
+
+.record-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: red;
+}
+
+.hint {
+  margin: 0;
+  color: var(--muted);
+}
+
+.recordings {
+  background: var(--surface);
+  border-radius: 18px;
+  padding: 24px;
+  border: 1px solid var(--border);
+  box-shadow: 0 16px 34px var(--shadow), 0 0 20px var(--glow);
+  animation: floatIn 0.8s ease-out both;
+}
+
+.recordings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.recordings-header h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.clear-button {
+  font-family: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  border-radius: 10px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.clear-button:hover {
+  box-shadow: 0 0 12px var(--glow);
+  border-color: rgba(56, 189, 248, 0.5);
+}
+
+.recordings-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.recording-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px;
+  border-radius: 14px;
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.recording-info {
+  display: grid;
+  gap: 2px;
+  min-width: 180px;
+}
+
+.recording-title {
+  font-weight: 600;
+}
+
+.recording-subtitle {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.recording-player {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.play-button {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.play-button svg {
+  width: 26px;
+  height: 26px;
+  fill: currentColor;
+}
+
+.play-button.is-playing {
+  box-shadow: 0 0 16px var(--glow);
+  border-color: rgba(56, 189, 248, 0.7);
+}
+.playback-slider {
+  width: 100%;
+  accent-color: var(--accent-strong);
+  appearance: none;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.25);
+}
+
+.playback-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent-strong);
+  box-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
+  border: 1px solid rgba(34, 211, 238, 0.7);
+}
+
+.playback-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent-strong);
+  box-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
+  border: 1px solid rgba(34, 211, 238, 0.7);
+}
+
+.playback-slider::-moz-range-track {
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.25);
+}
+
+.playback-time {
+  min-width: 110px;
+  font-size: 12px;
+  color: var(--text);
+  text-align: right;
+}
+
+.recording-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-left: auto;
+}
+
+.recording-item:hover {
+  box-shadow: 0 0 18px rgba(56, 189, 248, 0.15);
+  border-color: rgba(56, 189, 248, 0.45);
+}
+
+@keyframes pageFade {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes floatIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.action-button,
+.download-link {
+  font-family: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+  background: transparent;
+  color: var(--text);
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.action-icon {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+.action-label {
+  margin-left: 6px;
+}
+
+.action-button:hover,
+.download-link:hover {
+  box-shadow: 0 0 12px var(--glow);
+  border-color: rgba(56, 189, 248, 0.5);
+}
+
+.action-button.secondary {
+  background: var(--surface-muted);
+  color: var(--text);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 16px;
+  color: var(--muted);
+}
+
+@media (max-width: 720px) {
+  .recording-item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "info actions"
+      "player player";
+    align-items: center;
+    text-align: left;
+  }
+
+  .recording-info {
+    grid-area: info;
+  }
+
+  .recording-player {
+    grid-area: player;
+    flex-wrap: nowrap;
+  }
+
+  .recording-actions {
+    grid-area: actions;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    margin-left: 0;
+  }
+
+  .playback-time {
+    text-align: left;
+  }
+
+  .recordings-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .action-label {
+    display: none;
+  }
+
+  .action-button,
+  .download-link {
+    padding: 8px;
+  }
+}

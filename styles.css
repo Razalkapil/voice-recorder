@@ -209,6 +209,7 @@ canvas {
   opacity: 1;
   transform: scaleY(1);
   border-color: var(--border);
+  background: #0f172a;
 }
 
 .record-button:hover {
@@ -378,6 +379,7 @@ canvas {
   gap: 8px;
   align-items: center;
   margin-left: auto;
+  min-width: 80px;
 }
 
 .recording-item:hover {
